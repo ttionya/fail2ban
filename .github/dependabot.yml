@@ -1,11 +1,17 @@
 version: 2
+
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
+
+  - package-ecosystem: docker
+    directory: /
     schedule:
-      interval: "daily"
-      time: "08:00"
-      timezone: "Europe/Paris"
-    labels:
-      - "kind/dependencies"
-      - "bot"
+      interval: daily
+    commit-message:
+      prefix: 'feat:'
+
+  - package-ecosystem: 'github-actions'
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: 'chore:'
