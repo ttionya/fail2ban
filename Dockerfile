@@ -1,44 +1,52 @@
-# syntax=docker/dockerfile:1
-
 ARG FAIL2BAN_VERSION=1.1.0
-ARG ALPINE_VERSION=3.19
+ARG DEBIAN_VERSION=12-slim
 
-FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS fail2ban-src
-RUN apk add --no-cache git
-WORKDIR /src/fail2ban
-RUN git init . && git remote add origin "https://github.com/fail2ban/fail2ban.git"
+
+# Only used to notify upstream image updates
+FROM crazymax/fail2ban:1.1.0
+
+
+FROM debian:${DEBIAN_VERSION} AS fail2ban-src
+
 ARG FAIL2BAN_VERSION
-RUN git fetch origin "${FAIL2BAN_VERSION}" && git checkout -q FETCH_HEAD
 
-FROM alpine:${ALPINE_VERSION}
-RUN --mount=from=fail2ban-src,source=/src/fail2ban,target=/tmp/fail2ban,rw \
-  apk --update --no-cache add \
+RUN apt-get update \
+  && apt-get install -y wget unzip \
+  && wget -T 15 -t 10 "https://github.com/fail2ban/fail2ban/archive/${FAIL2BAN_VERSION}.zip" -O "/tmp/fail2ban-${FAIL2BAN_VERSION}.zip" \
+  && unzip -d "/tmp" "/tmp/fail2ban-${FAIL2BAN_VERSION}.zip" \
+  && mv "/tmp/fail2ban-${FAIL2BAN_VERSION}" "/tmp/fail2ban"
+
+
+FROM debian:${DEBIAN_VERSION}
+
+RUN --mount=from=fail2ban-src,source=/tmp/fail2ban,target=/tmp/fail2ban,rw \
+  apt-get update \
+  && apt-get install -y --no-install-recommends \
     bash \
     curl \
     grep \
     ipset \
     iptables \
-    iptables-legacy \
     kmod \
     nftables \
-    openssh-client-default \
+    openssh-client \
     python3 \
-    py3-dnspython \
-    py3-inotify \
+    python3-dev \
+    python3-dnspython \
+    python3-inotify \
+    python3-pip \
+    python3-setuptools \
+    python3-systemd \
     ssmtp \
     tzdata \
     wget \
     whois \
-  && apk --update --no-cache add -t build-dependencies \
-    build-base \
-    py3-pip \
-    py3-setuptools \
-    python3-dev \
   && cd /tmp/fail2ban \
-  && 2to3 -w --no-diffs bin/* fail2ban \
   && python3 setup.py install --without-tests \
-  && apk del build-dependencies \
-  && rm -rf /etc/fail2ban/jail.d /root/.cache
+  && apt-get remove -y --purge python3-dev python3-pip python3-setuptools \
+  && apt-get autoremove -y \
+  && apt-get clean -y \
+  && rm -rf /etc/fail2ban/jail.d /var/lib/apt/lists/*
 
 COPY entrypoint.sh /entrypoint.sh
 
