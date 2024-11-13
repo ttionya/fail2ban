@@ -118,4 +118,13 @@ fi
 iptables -V
 nft -v
 
+# Listen for new log files
+if [ -f "/etc/inotifywait.conf" ]; then
+  echo "Listening for new log files..."
+  inotifywait -m -r -e create --fromfile /etc/inotifywait.conf | while read path action file; do
+    echo "The file '$file' appeared in directory '$path'"
+    fail2ban-client reload
+  done &
+fi
+
 exec "$@"

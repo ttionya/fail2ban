@@ -25,6 +25,7 @@ RUN --mount=from=fail2ban-src,source=/tmp/fail2ban,target=/tmp/fail2ban,rw \
     bash \
     curl \
     grep \
+    inotify-tools \
     ipset \
     iptables \
     kmod \
