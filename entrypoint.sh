@@ -111,12 +111,8 @@ elif [ "$IPTABLES_MODE" = "legacy" ]; then
   iptablesLegacy=1
 fi
 if [ "$iptablesLegacy" -eq 1 ]; then
-  ln -sf /sbin/xtables-legacy-multi /sbin/iptables
-  ln -sf /sbin/xtables-legacy-multi /sbin/iptables-save
-  ln -sf /sbin/xtables-legacy-multi /sbin/iptables-restore
-  ln -sf /sbin/xtables-legacy-multi /sbin/ip6tables
-  ln -sf /sbin/xtables-legacy-multi /sbin/ip6tables-save
-  ln -sf /sbin/xtables-legacy-multi /sbin/ip6tables-restore
+  update-alternatives --set iptables /usr/sbin/iptables-legacy
+  update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 fi
 
 iptables -V
