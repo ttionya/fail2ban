@@ -106,6 +106,9 @@ iptablesLegacy=0
 if [ "$IPTABLES_MODE" = "auto" ] && ! iptables -L &> /dev/null; then
   echo "WARNING: iptables-nft is not supported by the host, falling back to iptables-legacy"
   iptablesLegacy=1
+elif iptables -L 2>&1 | grep -q "Warning: iptables-legacy tables present"; then
+  echo "WARNING: host has iptables-legacy tables present, falling back to iptables-legacy"
+  iptablesLegacy=1
 elif [ "$IPTABLES_MODE" = "legacy" ]; then
   echo "WARNING: iptables-legacy enforced"
   iptablesLegacy=1
