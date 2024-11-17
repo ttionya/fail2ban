@@ -53,6 +53,6 @@ target "image-beta" {
 target "image-test" {
   inherits = ["_common"]
   tags = [
-    "%{TEST_TAG}"
+    "${TEST_TAG}"
   ]
 }
