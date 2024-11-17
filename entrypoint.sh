@@ -111,8 +111,8 @@ elif [ "$IPTABLES_MODE" = "legacy" ]; then
   iptablesLegacy=1
 fi
 if [ "$iptablesLegacy" -eq 1 ]; then
-  update-alternatives --set iptables /usr/sbin/iptables-legacy
-  update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+  update-alternatives --log /dev/null --set iptables /usr/sbin/iptables-legacy
+  update-alternatives --log /dev/null --set ip6tables /usr/sbin/ip6tables-legacy
 fi
 
 iptables -V
@@ -125,7 +125,7 @@ if [ -f "/etc/inotifywait.conf" ]; then
   while IFS= read -r line; do
     [[ -z "${line}" || "${line}" =~ ^# ]] && continue
     inotifywait ${line} | while read path action file; do
-      echo "The file '$file' appeared in directory '$path'"
+      echo "Detected '$action' on '$file' in '$path'"
       fail2ban-client reload
     done &
   done < "/etc/inotifywait.conf"

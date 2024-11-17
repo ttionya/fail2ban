@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 ARG FAIL2BAN_VERSION=1.1.0
 ARG DEBIAN_VERSION=12-slim
 
