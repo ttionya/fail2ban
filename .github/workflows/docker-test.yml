@@ -1,22 +1,28 @@
-name: test
+name: 'Docker Test'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 on:
+  workflow_dispatch:
   push:
     branches:
-      - 'ignore'
+      - 'master'
+    paths-ignore:
+      - '**.md'
+  pull_request:
 
 
 env:
-  BUILD_TAG: fail2ban:test
-  CONTAINER_NAME: fail2ban
+  TEST_TAG: ttionya/fail2ban:test
 
 jobs:
   test:
+    name: Docker Test
+
     runs-on: ubuntu-latest
+
     strategy:
       fail-fast: false
       matrix:
@@ -24,6 +30,7 @@ jobs:
           - auto
           - nft
           - legacy
+
     steps:
       -
         name: Checkout
@@ -35,26 +42,26 @@ jobs:
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       -
-        name: Build
+        name: Build test image
         uses: docker/bake-action@v5
-        with:
-          targets: image-local
         env:
-          DEFAULT_TAG: ${{ env.BUILD_TAG }}
+          TEST_TAG: ${{ env.TEST_TAG }}
+        with:
+          targets: image-test
+          load: true
       -
         name: Start
         run: |
           docker compose up -d
         working-directory: test
         env:
-          FAIL2BAN_IMAGE: ${{ env.BUILD_TAG }}
-          FAIL2BAN_CONTAINER: ${{ env.CONTAINER_NAME }}
+          FAIL2BAN_IMAGE: ${{ env.TEST_TAG }}
           IPTABLES_MODE: ${{ matrix.iptables }}
       -
         name: Check container logs
         uses: crazy-max/.github/.github/actions/container-logs-check@main
         with:
-          container_name: ${{ env.CONTAINER_NAME }}
+          container_name: fail2ban
           log_check: "Server ready"
           timeout: 120
       -
@@ -64,5 +71,4 @@ jobs:
           docker compose logs
         working-directory: test
         env:
-          FAIL2BAN_IMAGE: ${{ env.BUILD_TAG }}
-          FAIL2BAN_CONTAINER: ${{ env.CONTAINER_NAME }}
+          FAIL2BAN_IMAGE: ${{ env.TEST_TAG }}

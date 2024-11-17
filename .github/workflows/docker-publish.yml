@@ -1,20 +1,23 @@
 name: 'Docker Publish'
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - '*'
+  schedule:
+    - cron: '0 6 * * 1'
 
 permissions:
   packages: write
 
 jobs:
-  publish-beta:
-    name: Docker Publish Beta
+  publish-stable:
+    name: Docker Publish
 
     runs-on: ubuntu-latest
 
-    if: ${{ contains(github.ref, '-b') }}
+    if: ${{ github.event_name != 'schedule' && !contains(github.ref, '-b') }}
 
     steps:
       -
@@ -22,7 +25,9 @@ jobs:
         uses: actions/checkout@v4
       -
         name: Prepare
-        run: echo "TAG=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+        run: |
+          echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          echo "UPSTREAM_VERSION=${VERSION%%-*}" >> $GITHUB_ENV
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -36,12 +41,145 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Build and push
-        uses: docker/build-push-action@v6
+        name: Login to ghcr.io
+        uses: docker/login-action@v3
         with:
-          context: '.'
-          file: './Dockerfile'
-          platforms: 'linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x'
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          labels: |
+            org.opencontainers.image.title=Fail2Ban
+            org.opencontainers.image.description=Intrusion prevention software framework that protects computer servers from brute-force attacks
+            org.opencontainers.image.vendor=ttionya
+            org.opencontainers.image.version=${{ env.VERSION }}
+      -
+        name: Build and push
+        uses: docker/bake-action@v5
+        env:
+          VERSION: ${{ env.UPSTREAM_VERSION }}
+        with:
+          files: |
+            ./docker-bake.hcl
+            ${{ steps.meta.outputs.bake-file-labels }}
+          targets: image-stable
           push: true
-          tags: |
-            ttionya/fail2ban:${{ env.TAG }}
+
+  publish-beta:
+    name: Docker Publish Beta
+
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event_name != 'schedule' && contains(github.ref, '-b') }}
+
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Prepare
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          labels: |
+            org.opencontainers.image.title=Fail2Ban
+            org.opencontainers.image.description=Intrusion prevention software framework that protects computer servers from brute-force attacks
+            org.opencontainers.image.vendor=ttionya
+            org.opencontainers.image.version=${{ env.VERSION }}
+      -
+        name: Build and push
+        uses: docker/bake-action@v5
+        env:
+          VERSION: ${{ env.VERSION }}
+        with:
+          files: |
+            ./docker-bake.hcl
+            ${{ steps.meta.outputs.bake-file-labels }}
+          targets: image-beta
+          push: true
+
+  publish-schedule:
+    name: Docker Publish Schedule
+
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event_name == 'schedule' }}
+
+    steps:
+      -
+        name: Get Tag
+        id: tag
+        uses: pozetroninc/github-action-get-latest-release@v0.8.0
+        with:
+          repository: ${{ github.repository }}
+          excludes: prerelease, draft
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ steps.tag.outputs.release }}
+      -
+        name: Prepare
+        run: |
+          TAG=${{ steps.tag.outputs.release }}
+          echo "VERSION=${TAG}" >> $GITHUB_ENV
+          echo "UPSTREAM_VERSION=${VERSION%%-*}" >> $GITHUB_ENV
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          labels: |
+            org.opencontainers.image.title=Fail2Ban
+            org.opencontainers.image.description=Intrusion prevention software framework that protects computer servers from brute-force attacks
+            org.opencontainers.image.vendor=ttionya
+            org.opencontainers.image.version=${{ env.VERSION }}
+      -
+        name: Build and push
+        uses: docker/bake-action@v5
+        env:
+          VERSION: ${{ env.UPSTREAM_VERSION }}
+        with:
+          files: |
+            ./docker-bake.hcl
+            ${{ steps.meta.outputs.bake-file-labels }}
+          targets: image-schedule
+          push: true

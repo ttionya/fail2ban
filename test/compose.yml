@@ -3,7 +3,7 @@ name: fail2ban
 services:
   fail2ban:
     image: ${FAIL2BAN_IMAGE:-crazymax/fail2ban}
-    container_name: ${FAIL2BAN_CONTAINER:-fail2ban}
+    container_name: fail2ban
     network_mode: host
     cap_add:
       - NET_ADMIN

@@ -1,28 +1,20 @@
-variable "DEFAULT_TAG" {
-  default = "fail2ban:local"
+variable "VERSION" {
+  default = "latest"
 }
 
-// Special target: https://github.com/docker/metadata-action#bake-definition
-target "docker-metadata-action" {
-  tags = ["${DEFAULT_TAG}"]
+variable "TEST_TAG" {
+  default = "ttionya/fail2ban:test"
 }
 
-// Default target if none specified
-group "default" {
-  targets = ["image-local"]
-}
+target "docker-metadata-action" {}
 
-target "image" {
+target "_common" {
   inherits = ["docker-metadata-action"]
+  context = "."
+  dockerfile = "Dockerfile"
 }
 
-target "image-local" {
-  inherits = ["image"]
-  output = ["type=docker"]
-}
-
-target "image-all" {
-  inherits = ["image"]
+target "_common_multi_platforms" {
   platforms = [
     "linux/386",
     "linux/amd64",
@@ -31,5 +23,36 @@ target "image-all" {
     "linux/arm64",
     "linux/ppc64le",
     "linux/s390x"
+  ]
+}
+
+target "_common_tags" {
+  tags = [
+    "ttionya/fail2ban:latest",
+    "ttionya/fail2ban:${VERSION}",
+    "ghcr.io/ttionya/fail2ban:latest",
+    "ghcr.io/ttionya/fail2ban:${VERSION}"
+  ]
+}
+
+target "image-stable" {
+  inherits = ["_common", "_common_multi_platforms", "_common_tags"]
+}
+
+target "image-schedule" {
+  inherits = ["image-stable"]
+}
+
+target "image-beta" {
+  inherits = ["_common", "_common_multi_platforms"]
+  tags = [
+    "ttionya/fail2ban:${VERSION}"
+  ]
+}
+
+target "image-test" {
+  inherits = ["_common"]
+  tags = [
+    "%{TEST_TAG}"
   ]
 }
