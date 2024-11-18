@@ -26,7 +26,8 @@ jobs:
       -
         name: Prepare
         run: |
-          echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          VERSION="${GITHUB_REF_NAME}"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
           echo "UPSTREAM_VERSION=${VERSION%%-*}" >> $GITHUB_ENV
       -
         name: Set up QEMU
@@ -140,8 +141,8 @@ jobs:
       -
         name: Prepare
         run: |
-          TAG=${{ steps.tag.outputs.release }}
-          echo "VERSION=${TAG}" >> $GITHUB_ENV
+          VERSION="${{ steps.tag.outputs.release }}"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
           echo "UPSTREAM_VERSION=${VERSION%%-*}" >> $GITHUB_ENV
       -
         name: Set up QEMU
