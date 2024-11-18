@@ -13,6 +13,7 @@ FROM debian:${DEBIAN_VERSION} AS fail2ban-src
 ARG FAIL2BAN_VERSION
 
 RUN apt-get update \
+  && apt-get upgrade -y \
   && apt-get install -y wget unzip \
   && wget -T 15 -t 10 "https://github.com/fail2ban/fail2ban/archive/${FAIL2BAN_VERSION}.zip" -O "/tmp/fail2ban-${FAIL2BAN_VERSION}.zip" \
   && unzip -d "/tmp" "/tmp/fail2ban-${FAIL2BAN_VERSION}.zip" \
