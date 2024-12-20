@@ -4,11 +4,11 @@
 
 This project is forked from [crazy-max/docker-fail2ban](https://github.com/crazy-max/docker-fail2ban) and modified based on it. **Any subsequent mention of `upstream` refers to that project.**
 
-**!!! If you are NOT looking for this project with a strong purpose, please use the [crazymax/fail2ban](https://hub.docker.com/r/crazymax/fail2ban) image directly.**
+**Note: If you are NOT looking for this project with a strong purpose, please use the [crazymax/fail2ban](https://hub.docker.com/r/crazymax/fail2ban) image directly.**
 
 ## About
 
-Two modifications were made when rebuilding this project:
+Two modifications were made when rebuilding of this project:
 
 1. Built based on `debian:12-slim` instead of `alpine`
 
@@ -26,7 +26,26 @@ The configuration for fail2ban is the same as upstream, please refer to the [cra
 
 ### inotifywait
 
-...
+You can use the built-in `inotifywait` to monitor the creation and removal of log files.
+
+You only need to mount the configuration file to `/etc/inotifywait.conf`. **This configuration file is specific to this image.**
+
+The typical configuration file is as follows:
+
+```
+# fail2ban-client reload (for all)
+-m -e create,moved_from --include .*\.access\..*\.log$ /var/logs/nginx
+
+# fail2ban-client reload nginx
+-m -e create,moved_from --include .*\.access\..*\.log$ /var/logs/nginx [nginx]
+
+# fail2ban-client reload nginx && fail2ban-client reload httpd
+-m -e create,moved_from --include .*\.access\..*\.log$ /var/logs/nginx [nginx httpd]
+```
+
+1. Each line is an option section for `inotifywait` (excluding the `inotifywait` command).
+2. Blank lines and lines starting with `#` are ignored.
+3. The trailing `[jail]` is **OPTIONAL** and represents which jails need to be reloaded when the watch is triggered, separated by **SPACES**.
 
 ## Schedule
 
