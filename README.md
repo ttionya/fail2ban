@@ -47,6 +47,28 @@ The typical configuration file is as follows:
 2. Blank lines and lines starting with `#` are ignored.
 3. The trailing `[jail]` is **OPTIONAL** and represents which jails need to be reloaded when the watch is triggered, separated by **SPACES**.
 
+## Example
+
+```sh
+docker run -d \
+  --mount type=bind,source=/path/to/fail2ban/data,target=/data \
+  --mount type=bind,source=/path/to/inotifywait.conf,target=/etc/inotifywait.conf \
+  --mount type=bind,source=/path/to/logs,target=/var/logs \
+  ttionya/fail2ban
+```
+
+## Versioning
+
+The version is divided into three parts, separated by hyphens (`-`).
+
+| Part | Version | Description                                              |
+|------|---------|----------------------------------------------------------|
+| 1    | `1.1.0`   | `fail2ban` version number                                | 
+| 2    | `r1`      | Upstream version number                                  |
+| 3    | `1` or `b1` | Project version number (`b` for beta, number for stable) |
+
+The image version number follows the upstream release method and only retains the `fail2ban` version number.
+
 ## Schedule
 
 To ensure the use of the latest dependencies, this image is rebuilt every Monday at 6:00 AM.
