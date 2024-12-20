@@ -131,7 +131,7 @@ if [ -f "/etc/inotifywait.conf" ]; then
       command="${line}"
       jails=""
     fi
-    inotifywait ${line} | while read path action file; do
+    inotifywait ${command} | while read path action file; do
       echo "Detected '${action}' on '${file}' in '${path}'"
       if [[ -n "${jails}" ]]; then
         for jail in ${jails}; do
