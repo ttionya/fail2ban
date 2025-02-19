@@ -47,6 +47,7 @@ jobs:
         env:
           TEST_TAG: ${{ env.TEST_TAG }}
         with:
+          source: .
           targets: image-test
           load: true
       -
