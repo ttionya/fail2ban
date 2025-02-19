@@ -43,7 +43,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
       -
         name: Build test image
-        uses: docker/bake-action@v5
+        uses: docker/bake-action@v6
         env:
           TEST_TAG: ${{ env.TEST_TAG }}
         with:
