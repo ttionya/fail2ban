@@ -41,7 +41,6 @@ RUN --mount=from=fail2ban-src,source=/tmp/fail2ban,target=/tmp/fail2ban,rw \
     python3-pip \
     python3-setuptools \
     python3-systemd \
-    ssmtp \
     tzdata \
     wget \
     whois \
