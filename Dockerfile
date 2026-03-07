@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ARG FAIL2BAN_VERSION=1.1.0
-ARG DEBIAN_VERSION=12-slim
+ARG DEBIAN_VERSION=13-slim
 
 
 # Only used to notify upstream image updates
