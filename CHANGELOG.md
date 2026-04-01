@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0-r4-0 (20260401)
+
+### Feature
+
+- Bump `debian:12-slim` to `debian:13-slim`
+
+<br>
+
 ## 1.1.0-r3-0 (20250713)
 
 ### Feature
