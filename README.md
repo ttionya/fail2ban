@@ -10,7 +10,7 @@ This project is forked from [crazy-max/docker-fail2ban](https://github.com/crazy
 
 Two modifications were made when rebuilding of this project:
 
-1. Built based on `debian:12-slim` instead of `alpine`
+1. Built based on `debian:13-slim` instead of `alpine`
 
    Alpine does not support the `systemd` backend. If you need to set `backend: systemd` due to the journal logging system, you can try using this image.
 
