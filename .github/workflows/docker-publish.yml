@@ -60,7 +60,7 @@ jobs:
             org.opencontainers.image.version=${{ env.VERSION }}
       -
         name: Build and push
-        uses: docker/bake-action@v6
+        uses: docker/bake-action@v7
         env:
           VERSION: ${{ env.UPSTREAM_VERSION }}
         with:
@@ -109,7 +109,7 @@ jobs:
             org.opencontainers.image.version=${{ env.VERSION }}
       -
         name: Build and push
-        uses: docker/bake-action@v6
+        uses: docker/bake-action@v7
         env:
           VERSION: ${{ env.VERSION }}
         with:
@@ -177,7 +177,7 @@ jobs:
             org.opencontainers.image.version=${{ env.VERSION }}
       -
         name: Build and push
-        uses: docker/bake-action@v6
+        uses: docker/bake-action@v7
         env:
           VERSION: ${{ env.UPSTREAM_VERSION }}
         with:
