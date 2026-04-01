@@ -46,7 +46,7 @@ RUN --mount=from=fail2ban-src,source=/tmp/fail2ban,target=/tmp/fail2ban,rw \
     whois \
   && cd /tmp/fail2ban \
   && python3 setup.py install --without-tests \
-  && apt-get remove -y --purge python3-dev python3-pip python3-setuptools \
+  && apt-get remove -y --purge python3-dev python3-pip \
   && apt-get autoremove -y \
   && apt-get clean -y \
   && rm -rf /etc/fail2ban/jail.d /var/lib/apt/lists/*
