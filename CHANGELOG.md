@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0-r5-0 (20260517)
+
+### Feature
+
+- Add `linux/riscv64` support
+
+<br>
+
 ## 1.1.0-r4-0 (20260401)
 
 ### Feature
