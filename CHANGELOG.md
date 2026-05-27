@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0-r5-1 (20260527)
+
+### Feature
+
+- Updated `sshd` filter to support OpenSSH's new daemon name `sshd-session`
+
+<br>
+
 ## 1.1.0-r5-0 (20260517)
 
 ### Feature
