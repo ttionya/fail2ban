@@ -14,15 +14,21 @@ Two modifications were made when rebuilding of this project:
 
    Alpine does not support the `systemd` backend. If you need to set `backend: systemd` due to the journal logging system, you can try using this image.
 
-2. Built-in `inotify-tools`, including the `inotifywait` command.
+2. Support OpenSSH's new daemon name in `sshd` filter
 
-   If your log file names rotate over time, you can use `inotifywait` to monitor file creation or deletion and reload fail2ban.
+   OpenSSH earlier renamed its daemon from `sshd` to `sshd-session`, which requires updating the `journalmatch` to correctly parse sshd logs. Fail2Ban has already merged the necessary changes but has not yet released a new version. For details, please refer to [fail2ban/fail2ban#3782](https://github.com/fail2ban/fail2ban/pull/3782/changes) and [fail2ban/fail2ban@54c0eff](https://github.com/fail2ban/fail2ban/commit/54c0effceb998b73545073ac59c479d9d9bf19a4).
+   
+   This project includes all 3 changes made to `config/filter.d/sshd.conf` between Fail2Ban version 1.1.0 and the current master branch ([1.1.0...master](https://github.com/fail2ban/fail2ban/compare/1.1.0...master#diff-120d2a5dc726069f28331bedf42e87e00784ed21d9fc77296502b0c4c9cdd80b)).
+
+3. Built-in `inotify-tools`, including the `inotifywait` command.
+
+   If your log file names rotate over time, you can use `inotifywait` to monitor file creation or deletion and reload Fail2Ban.
 
 ## Usage
 
 ### fail2ban
 
-The configuration for fail2ban is the same as upstream, please refer to the [crazy-max/docker-fail2ban documentation](https://github.com/crazy-max/docker-fail2ban/blob/master/README.md).
+The configuration for Fail2Ban is the same as upstream, please refer to the [crazy-max/docker-fail2ban documentation](https://github.com/crazy-max/docker-fail2ban/blob/master/README.md).
 
 ### inotifywait
 
