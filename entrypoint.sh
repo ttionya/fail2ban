@@ -49,6 +49,17 @@ for filter in ${filters}; do
   ln -sf "/data/filter.d/${filter}" "/etc/fail2ban/filter.d/"
 done
 
+# Custom patch
+echo "Applying sshd.conf filter patch..."
+# https://github.com/fail2ban/fail2ban/compare/1.1.0...master#diff-120d2a5dc726069f28331bedf42e87e00784ed21d9fc77296502b0c4c9cdd80b
+# https://github.com/fail2ban/fail2ban/pull/3782/changes
+# https://github.com/fail2ban/fail2ban/commit/54c0effceb998b73545073ac59c479d9d9bf19a4
+if [ -f "/etc/fail2ban/filter.d/sshd.conf" ]; then
+  sed -i 's/^_daemon = sshd$/_daemon = sshd(?:-session)?/' /etc/fail2ban/filter.d/sshd.conf
+  sed -i 's/^mdre-ddos = ^(?:Did not receive identification string from|Timeout before authentication for) <HOST>$/mdre-ddos = ^(?:Did not receive identification string from|Timeout before authentication for(?: connection from)?) <HOST>/' /etc/fail2ban/filter.d/sshd.conf
+  sed -i 's/^journalmatch = .*/journalmatch = _SYSTEMD_UNIT=sshd.service + _COMM=sshd + _COMM=sshd-session/' /etc/fail2ban/filter.d/sshd.conf
+fi
+
 iptablesLegacy=0
 if [ "$IPTABLES_MODE" = "auto" ] && ! iptables -L &> /dev/null; then
   echo "WARNING: iptables-nft is not supported by the host, falling back to iptables-legacy"
