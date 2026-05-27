@@ -8,7 +8,7 @@ This project is forked from [crazy-max/docker-fail2ban](https://github.com/crazy
 
 ## About
 
-Two modifications were made when rebuilding of this project:
+Three modifications were made when rebuilding of this project:
 
 1. Built based on `debian:13-slim` instead of `alpine`
 
