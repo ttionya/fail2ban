@@ -13,7 +13,6 @@ on:
       - '**.md'
   pull_request:
 
-
 env:
   TEST_TAG: ttionya/fail2ban:test
 
@@ -62,7 +61,7 @@ jobs:
         name: Check container logs
         uses: crazy-max/.github/.github/actions/container-logs-check@main
         with:
-          container_name: fail2ban
+          name: fail2ban
           log_check: "Server ready"
           timeout: 120
       -
