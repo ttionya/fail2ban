@@ -5,7 +5,7 @@ ARG DEBIAN_VERSION=13-slim
 
 
 # Only used to notify upstream image updates
-FROM crazymax/fail2ban:1.1.0
+FROM crazymax/fail2ban:1.1.1
 
 
 FROM debian:${DEBIAN_VERSION} AS fail2ban-src
