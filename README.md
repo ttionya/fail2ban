@@ -4,6 +4,8 @@
 
 This project is forked from [crazy-max/docker-fail2ban](https://github.com/crazy-max/docker-fail2ban) and modified based on it. **Any subsequent mention of `upstream` refers to that project.**
 
+Starting with Fail2Ban 1.1.1, this project no longer builds from a modified copy of the upstream source code. Instead, it periodically builds from the `crazymax/fail2ban:<version>-debian` image published by the upstream project, with additional enhancements. The last version built this way, Fail2Ban 1.1.0, is available in the [1.1.0 branch](https://github.com/ttionya/fail2ban/tree/1.1.0).
+
 **Note: If you are NOT looking for this project with a strong purpose, please use the [crazymax/fail2ban](https://hub.docker.com/r/crazymax/fail2ban) image directly.**
 
 ## About
