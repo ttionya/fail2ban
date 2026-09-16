@@ -19,3 +19,5 @@ COPY --chmod=755 entrypoint-wrapper.sh /entrypoint-wrapper.sh
 COPY --chmod=755 entrypoint2.sh /entrypoint2.sh
 
 ENTRYPOINT [ "/entrypoint-wrapper.sh" ]
+
+CMD [ "fail2ban-server", "-f", "-x", "-v", "start" ]
