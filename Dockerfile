@@ -15,7 +15,7 @@ RUN apt-get update \
   && echo "Execute: fail2ban-server --test" \
   && fail2ban-server --test
 
-COPY --mod=755 entrypoint-wrapper.sh /entrypoint-wrapper.sh
-COPY --mod=755 entrypoint2.sh /entrypoint2.sh
+COPY --chmod=755 entrypoint-wrapper.sh /entrypoint-wrapper.sh
+COPY --chmod=755 entrypoint2.sh /entrypoint2.sh
 
 ENTRYPOINT [ "/entrypoint-wrapper.sh" ]
