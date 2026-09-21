@@ -2,25 +2,21 @@
 
 [![Docker Image Version (latest by date)](https://img.shields.io/docker/v/ttionya/fail2ban?label=Version&logo=docker)](https://hub.docker.com/r/ttionya/fail2ban/tags) [![Docker Pulls](https://img.shields.io/docker/pulls/ttionya/fail2ban?label=Docker%20Pulls&logo=docker)](https://hub.docker.com/r/ttionya/fail2ban) [![GitHub](https://img.shields.io/github/license/ttionya/fail2ban?label=License&logo=github)](https://github.com/ttionya/fail2ban/blob/master/LICENSE)
 
-This project is forked from [crazy-max/docker-fail2ban](https://github.com/crazy-max/docker-fail2ban) and modified based on it. **Any subsequent mention of `upstream` refers to that project.**
+This project is forked from [crazy-max/docker-fail2ban](https://github.com/crazy-max/docker-fail2ban) and modified from it. **Any subsequent mention of `upstream` refers to that project.**
+
+Starting with Fail2Ban 1.1.1, this project no longer builds from a modified copy of the upstream source code. Instead, it periodically builds from the `crazymax/fail2ban:<version>-debian` image published by the upstream project, with additional enhancements. The last version built the old way, Fail2Ban 1.1.0, is available in the [1.1.0 branch](https://github.com/ttionya/fail2ban/tree/1.1.0).
 
 **Note: If you are NOT looking for this project with a strong purpose, please use the [crazymax/fail2ban](https://hub.docker.com/r/crazymax/fail2ban) image directly.**
 
 ## About
 
-Three modifications were made when rebuilding of this project:
+This project is rebuilt from the upstream `crazymax/fail2ban:<version>-debian` image with the following modifications:
 
-1. Built based on `debian:13-slim` instead of `alpine`
+1. Keep dependencies up to date.
 
-   Alpine does not support the `systemd` backend. If you need to set `backend: systemd` due to the journal logging system, you can try using this image.
+   To ensure timely security updates, all dependencies are updated on every rebuild. As a result, the image size may vary depending on the updated dependencies.
 
-2. Support OpenSSH's new daemon name in `sshd` filter
-
-   OpenSSH earlier renamed its daemon from `sshd` to `sshd-session`, which requires updating the `journalmatch` to correctly parse sshd logs. Fail2Ban has already merged the necessary changes but has not yet released a new version. For details, please refer to [fail2ban/fail2ban#3782](https://github.com/fail2ban/fail2ban/pull/3782/changes) and [fail2ban/fail2ban@54c0eff](https://github.com/fail2ban/fail2ban/commit/54c0effceb998b73545073ac59c479d9d9bf19a4).
-   
-   This project includes all 3 changes made to `config/filter.d/sshd.conf` between Fail2Ban version 1.1.0 and the current master branch ([1.1.0...master](https://github.com/fail2ban/fail2ban/compare/1.1.0...master#diff-120d2a5dc726069f28331bedf42e87e00784ed21d9fc77296502b0c4c9cdd80b)).
-
-3. Built-in `inotify-tools`, including the `inotifywait` command.
+2. Built-in `inotify-tools`, including the `inotifywait` command.
 
    If your log file names rotate over time, you can use `inotifywait` to monitor file creation or deletion and reload Fail2Ban.
 
@@ -34,22 +30,22 @@ The configuration for Fail2Ban is the same as upstream, please refer to the [cra
 
 You can use the built-in `inotifywait` to monitor the creation and removal of log files.
 
-You only need to mount the configuration file to `/etc/inotifywait.conf`. **This configuration file is specific to this image.**
+To enable it, mount a configuration file at `/etc/inotifywait.conf`. **This configuration file is specific to this image.**
 
 The typical configuration file is as follows:
 
 ```
 # fail2ban-client reload (for all)
--m -e create,moved_from --include .*\.access\..*\.log$ /var/logs/nginx
+-m -e create,moved_from --include .*\.access\..*\.log$ /var/log/nginx
 
 # fail2ban-client reload nginx
--m -e create,moved_from --include .*\.access\..*\.log$ /var/logs/nginx [nginx]
+-m -e create,moved_from --include .*\.access\..*\.log$ /var/log/nginx [nginx]
 
 # fail2ban-client reload nginx && fail2ban-client reload httpd
--m -e create,moved_from --include .*\.access\..*\.log$ /var/logs/nginx [nginx httpd]
+-m -e create,moved_from --include .*\.access\..*\.log$ /var/log/nginx [nginx httpd]
 ```
 
-1. Each line is an option section for `inotifywait` (excluding the `inotifywait` command).
+1. Each line contains the arguments passed to `inotifywait`, excluding the command name itself.
 2. Blank lines and lines starting with `#` are ignored.
 3. The trailing `[jail]` is **OPTIONAL** and represents which jails need to be reloaded when the watch is triggered, separated by **SPACES**.
 
@@ -57,9 +53,15 @@ The typical configuration file is as follows:
 
 ```sh
 docker run -d \
+  --network host \
+  --cap-add NET_ADMIN \
+  --cap-add NET_RAW \
   --mount type=bind,source=/path/to/fail2ban/data,target=/data \
-  --mount type=bind,source=/path/to/inotifywait.conf,target=/etc/inotifywait.conf \
-  --mount type=bind,source=/path/to/logs,target=/var/logs \
+  --mount type=bind,source=/path/to/inotifywait.conf,target=/etc/inotifywait.conf,readonly \
+  --mount type=bind,source=/run/log/journal,target=/run/log/journal,readonly \
+  --mount type=bind,source=/var/log/journal,target=/var/log/journal,readonly \
+  --mount type=bind,source=/etc/machine-id,target=/etc/machine-id,readonly \
+  --mount type=bind,source=/var/log/nginx,target=/var/log/nginx,readonly \
   ttionya/fail2ban
 ```
 
@@ -73,11 +75,9 @@ The version is divided into three parts, separated by hyphens (`-`).
 | 2    | `r1`      | Upstream version number                                  |
 | 3    | `1` or `b1` | Project version number (`b` for beta, number for stable) |
 
-The image version number follows the upstream release method and only retains the `fail2ban` version number.
-
 ## Schedule
 
-To ensure the use of the latest dependencies, this image is rebuilt every Monday at 6:00 AM.
+To ensure the use of the latest dependencies, this image is rebuilt every Monday at 06:00 UTC.
 
 ## Thanks
 

@@ -62,7 +62,8 @@ jobs:
         name: Build and push
         uses: docker/bake-action@v7
         env:
-          VERSION: ${{ env.UPSTREAM_VERSION }}
+          VERSION: ${{ env.VERSION }}
+          UPSTREAM_VERSION: ${{ env.UPSTREAM_VERSION }}
         with:
           source: .
           files: |
@@ -179,7 +180,8 @@ jobs:
         name: Build and push
         uses: docker/bake-action@v7
         env:
-          VERSION: ${{ env.UPSTREAM_VERSION }}
+          VERSION: ${{ env.VERSION }}
+          UPSTREAM_VERSION: ${{ env.UPSTREAM_VERSION }}
         with:
           source: .
           files: |
