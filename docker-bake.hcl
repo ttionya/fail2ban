@@ -2,6 +2,10 @@ variable "VERSION" {
   default = "latest"
 }
 
+variable "UPSTREAM_VERSION" {
+  default = "latest"
+}
+
 variable "TEST_TAG" {
   default = "ttionya/fail2ban:test"
 }
@@ -29,8 +33,10 @@ target "_common_tags" {
   tags = [
     "ttionya/fail2ban:latest",
     "ttionya/fail2ban:${VERSION}",
+    "ttionya/fail2ban:${UPSTREAM_VERSION}",
     "ghcr.io/ttionya/fail2ban:latest",
-    "ghcr.io/ttionya/fail2ban:${VERSION}"
+    "ghcr.io/ttionya/fail2ban:${VERSION}",
+    "ghcr.io/ttionya/fail2ban:${UPSTREAM_VERSION}"
   ]
 }
 
